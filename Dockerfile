@@ -44,4 +44,5 @@ RUN php artisan key:generate || true
 EXPOSE 80
 
 # Comando default
-CMD ["apache2-foreground"]
+# Ejecutar migraciones al arrancar Apache
+CMD php artisan migrate --force && apache2-foreground

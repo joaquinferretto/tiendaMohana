@@ -3,11 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Producto extends Model
 {
-    use SoftDeletes;
+    use HasFactory;
 
     protected $table = 'productos';
     protected $primaryKey = 'id_producto';
@@ -16,19 +16,18 @@ class Producto extends Model
         'nombre',
         'descripcion',
         'precio',
-        'stock',
-        'talla',
         'color',
-        'imagen',
-        'estado',
         'categoria',
+        'imagen',
     ];
-
-    protected $dates = ['deleted_at'];
 
     public function tallas()
     {
-        return $this->hasMany(ProductoTalla::class, 'id_producto', 'id_producto');
+        return $this->hasMany(Talla::class, 'id_producto', 'id_producto');
     }
 
+    public function detalleVentas()
+    {
+        return $this->hasMany(DetalleVenta::class, 'id_producto', 'id_producto');
+    }
 }

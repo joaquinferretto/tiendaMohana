@@ -1,0 +1,57 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Venta;
+use App\Models\DetalleVenta;
+use App\Models\Producto;
+use Illuminate\Http\Request;
+
+class VentaController extends Controller
+{
+    public function index()
+    {
+        $ventas = Venta::with('detalles.producto')->get();
+        return view('ventas.index', compact('ventas'));
+    }
+
+    public function create()
+    {
+        $productos = Producto::all();
+        return view('ventas.create', compact('productos'));
+    }
+
+    public function store(Request $request)
+    {
+        $venta = Venta::create([
+            'fecha' => now(),
+            'total' => 0
+        ]);
+
+        $total = 0;
+
+        foreach ($request->productos as $producto_id => $cantidad) {
+            $producto = Producto::findOrFail($producto_id);
+            $subtotal = $producto->precio * $cantidad;
+
+            $venta->detalles()->create([
+                'id_producto' => $producto_id,
+                'cantidad' => $cantidad,
+                'precio_unitario' => $producto->precio,
+                'subtotal' => $subtotal,
+            ]);
+
+            $total += $subtotal;
+        }
+
+        $venta->update(['total' => $total]);
+
+        return redirect()->route('ventas.index')->with('success', 'Venta registrada.');
+    }
+
+    public function show($id)
+    {
+        $venta = Venta::with('detalles.producto')->findOrFail($id);
+        return view('ventas.show', compact('venta'));
+    }
+}

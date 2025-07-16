@@ -1,0 +1,49 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Talla;
+use App\Models\Producto;
+use Illuminate\Http\Request;
+
+class TallaController extends Controller
+{
+    public function index()
+    {
+        $tallas = Talla::with('producto')->get();
+        return view('tallas.index', compact('tallas'));
+    }
+
+    public function create()
+    {
+        $productos = Producto::all();
+        return view('tallas.create', compact('productos'));
+    }
+
+    public function store(Request $request)
+    {
+        Talla::create($request->all());
+        return redirect()->route('tallas.index')->with('success', 'Talla creada correctamente.');
+    }
+
+    public function edit($id)
+    {
+        $talla = Talla::findOrFail($id);
+        $productos = Producto::all();
+        return view('tallas.edit', compact('talla', 'productos'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $talla = Talla::findOrFail($id);
+        $talla->update($request->all());
+        return redirect()->route('tallas.index')->with('success', 'Talla actualizada.');
+    }
+
+    public function destroy($id)
+    {
+        $talla = Talla::findOrFail($id);
+        $talla->delete();
+        return redirect()->route('tallas.index')->with('success', 'Talla eliminada.');
+    }
+}
